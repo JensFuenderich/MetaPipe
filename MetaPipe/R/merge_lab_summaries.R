@@ -1,0 +1,148 @@
+#' Merging Lab Summaries
+#'
+#' @description Some description of the function
+#' @param data Either a list object or a path to a folder containing the lab summaries.
+#' @param output_folder define a path to which the merged lab summaries and the codebook are exported.
+#' @param suppress_list_output a logical indicating whether results should be returned in R.
+#' @import readr
+#' @import dplyr
+#' @import glue
+#' @import utils
+#' @return
+#' If all .csv files or list elements from the data input of the function are named coherently, the function returns a list with two elements (merged df & codebook) and optionally a folder (in case output_path is specified)
+#' @export
+#'
+#' @examples
+#' ## Example with a list object (number of columns drastically reduced for illustration)
+#' test_list <- list(data.frame(Project = c(1,1), Replication = c(1,1), Lab = c(1,2), T_M = c(0.5, 0.7)),  data.frame(Project = c(1,1), Replication = c(2,2), Lab = c(1,2), T_M = c(3, 5)))
+#' merge_lab_summaries(data = test_list)
+#' # returns a list with the "merged lab summaries" and the "codebook"
+merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALSE){
+
+  ## Merge lab summaries
+
+  if (is.list(data) == TRUE) {
+
+    merged_lab_summaries <- do.call(rbind.data.frame, data)
+
+  } else if(file.exists(data) == TRUE) {
+
+    # collect file names from folder specified in data
+    files <- list.files(path = file.path(data), pattern = "*.csv", full.names = T)
+
+    # import the files and store as data frame
+    tbl <- sapply(files, read_csv, simplify=FALSE) %>% bind_rows(.id = "id")
+    merged_lab_summaries <- as.data.frame(tbl)
+
+    # drop id column
+    merged_lab_summaries$id <- NULL
+
+    # drop redundant id column
+    merged_lab_summaries$...1 <- NULL # not quite sure how to avoid this column being created in the first place
+
+  } else {
+
+    warning("Make sure to the 'data' input is either a list object or a valid path.")
+
+  }
+
+  ## Create codebook
+
+  if (is.list(data) != TRUE && file.exists(data) != TRUE) {
+
+    # function returns warning from the "Merge lab summaries" chunk, no further action necessary
+
+  } else {
+
+    # create empty df
+    abbr_library <- data.frame(Abbreviation = logical(0),
+                               Full_Name = logical(0))
+
+    # pair abbreviations with verbal descriptions
+    abbr_library <- as.data.frame(base::rbind(c("T_", "treatment group_"),
+                                              c("C_", "control group_"),
+                                              c("_N", "_number of participants"),
+                                              c("_K", "_number of labs"),
+                                              c("_MD", "_mean difference"),
+                                              c("_Model_Estimate_", "_model estimate for_"),
+                                              c("_M", "_mean"),
+                                              c("_SD", "_standard deviation"),
+                                              c("SE_", "standard error of the_"),
+                                              c("SMD", "standardized mean difference"),
+                                              c("pooled_", "pooled_"),
+                                              c("Lab__", "lab level:__")
+    ))
+
+    # rename columns of df
+    names(abbr_library) <- c("Abbreviation", "Full Name")
+
+    # extract names from merged df
+    description_vector <- names(merged_lab_summaries)
+
+    # sorry for this, did not want to loop
+    # check if there's enough pipes in that orchestra
+    #nrow(abbr_library) (the result of this should be equivalent to the max indexing in the following chunk)
+
+    description_vector %<>%
+      gsub(abbr_library$Abbreviation[1], abbr_library$`Full Name`[1], .) %>%
+      gsub(abbr_library$Abbreviation[2], abbr_library$`Full Name`[2], .) %>%
+      gsub(abbr_library$Abbreviation[3], abbr_library$`Full Name`[3], .) %>%
+      gsub(abbr_library$Abbreviation[4], abbr_library$`Full Name`[4], .) %>%
+      gsub(abbr_library$Abbreviation[5], abbr_library$`Full Name`[5], .) %>%
+      gsub(abbr_library$Abbreviation[6], abbr_library$`Full Name`[6], .) %>%
+      gsub(abbr_library$Abbreviation[7], abbr_library$`Full Name`[7], .) %>%
+      gsub(abbr_library$Abbreviation[8], abbr_library$`Full Name`[8], .) %>%
+      gsub(abbr_library$Abbreviation[9], abbr_library$`Full Name`[9], .) %>%
+      gsub(abbr_library$Abbreviation[10], abbr_library$`Full Name`[10], .) %>%
+      gsub(abbr_library$Abbreviation[11], abbr_library$`Full Name`[11], .) %>%
+      gsub(abbr_library$Abbreviation[12], abbr_library$`Full Name`[12], .) %>%
+      gsub(abbr_library$Abbreviation[13], abbr_library$`Full Name`[13], .) %>%
+      gsub(abbr_library$Abbreviation[14], abbr_library$`Full Name`[14], .)
+
+    description_vector <- stringr::str_replace_all(description_vector, "_", " ")
+
+    codebook <- data.frame(Variable_Name = names(merged_lab_summaries), Variable_Description = description_vector)
+    codebook <- codebook[-c(1:2),]
+
+    # do this one by hand, otherwise the abbr "MD" messes up the code
+    codebook[codebook$Variable_Name == "MD",2] <- "mean difference"
+
+  }
+
+  ## Outputs
+
+  if (missing(output_folder)) {
+
+    print("You chose not to export the data as .csv files.")
+
+  } else {
+
+    # export .csv files
+    write.csv(merged_lab_summaries, glue::glue("{output_folder}merged lab summeries.csv"))
+    write.csv(codebook, glue::glue("{output_folder}codebook for merged lab summeries.csv"))
+
+  }
+
+  if (suppress_list_output == TRUE) {
+
+    print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
+
+  } else if (suppress_list_output == FALSE) {
+
+    # create list output
+    output <- list(merged_lab_summaries, codebook)
+
+    # rename list elements
+    names(output) <- c("merged_lab_summaries", "codebook")
+
+    # return the output (function aborts here)
+    return(output)
+
+  }
+
+}
+
+
+
+
+
