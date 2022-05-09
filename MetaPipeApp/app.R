@@ -2,34 +2,6 @@
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 #
-
-
-##### Aktuelles To Do:
-
-## full_pipeline output so verändern, dass der die Informationen enthält die die App braucht (also die aus den Laboren! )
-
-
-
-
-###### TO DOs
-## DONE:
-### 1. Ordner mit leerer "Final Data Frame" Datei und gefüllter codebook Datei erstellen
-### 2. versuchen die Dateien in server Part der app einzulesen (möglicherweise auch in ui, oder beides) <- ist außerhalb dessen, müsste aber funktionieren: https://shiny.rstudio.com/tutorial/written-tutorial/lesson5/ (siehe "Execution")
-### 3. Upload Seite erstellen: IPD und Aggregated Data Upload erstmal nur als leere Felder, MA Data Upload funktionsfähig schreiben
-### 4. Upload mit "Meta Analysis Data Selection" verknüpfen
-### 5. Test der bisherigen Funktionsweise
-
-## OPEN:
-### 7. Meta Regression überall rausnehmen
-### 8. MetaPipe Befehle finalisieren und Dokumentation fertigstellen
-### 9. MetaPipe über github/gitlab verfügbar machen
-### 10. MetaPipe Befehle in die App einarbeiten (in Upload Data)
-### 11. Funktionalität von "Upload Data" finalisieren
-### 12. Plot-Funktionen finalisieren
-#### Veröffentlichungsweg (Packet: CRAN, App: ?) klären (und Zusammenhang mit Publikation)
-
-library(MetaPipe)
-
 ## install pacman package if you haven't already
 # install.packages("pacman")
 library(pacman)
@@ -41,7 +13,11 @@ pacman::p_load("shiny",
                "DT",
                "ggplot2",
                "shinyWidgets",
-               "shinythemes")
+               "shinythemes",
+               "devtools")
+
+devtools::install_github("JensFuenderich/MetaPipe", subdir = "MetaPipe")
+library(MetaPipe)
 
 ### general imports
 MA_data <- readr::read_csv(here::here("Data","Input","MetaPipeApp Data Empty.csv"))[,-1]
