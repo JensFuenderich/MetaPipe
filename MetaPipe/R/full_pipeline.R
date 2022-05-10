@@ -66,7 +66,7 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
     write.csv(x, file = glue::glue("{MetaPipe_folder}/Individual Participant Data/{project_name}_{replication_name}_individual_participant_data.csv"))
   }
   # apply function
-  lapply(Data_List, export_ipd_fun)
+  if (missing(output_folder)) {} else { lapply(Data_List, export_ipd_fun) }
 
   ## create codebook for individual participant data
   codebook_ipd <- c()
@@ -79,21 +79,36 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
   names(output_list$`Individual Participant Data`) <- c("individual participant data", "codebook_ipd")
 
   ## 2. Step of Pipeline: create lab summaries
-  output_list$`Lab Summaries` <- MetaPipe::create_lab_summaries(data = Data,
-                                                                Project = {{Project}},
-                                                                Replication = {{Replication}},
-                                                                Lab = {{Lab}},
-                                                                DV = {{DV}},
-                                                                Group = {{Group}},
-                                                                IV = {{IV}},
-                                                                output_folder = if (missing(output_folder)) {} else {glue::glue("{MetaPipe_folder}/Lab Summaries/")},
-                                                                suppress_list_output = FALSE)
-
+  if (missing(output_folder)) {
+    output_list$`Lab Summaries` <- MetaPipe::create_lab_summaries(data = Data,
+                                                                  Project = {{Project}},
+                                                                  Replication = {{Replication}},
+                                                                  Lab = {{Lab}},
+                                                                  DV = {{DV}},
+                                                                  Group = {{Group}},
+                                                                  IV = {{IV}},
+                                                                  suppress_list_output = FALSE)
+  } else {
+    output_list$`Lab Summaries` <- MetaPipe::create_lab_summaries(data = Data,
+                                                                  Project = {{Project}},
+                                                                  Replication = {{Replication}},
+                                                                  Lab = {{Lab}},
+                                                                  DV = {{DV}},
+                                                                  Group = {{Group}},
+                                                                  IV = {{IV}},
+                                                                  output_folder = glue::glue("{MetaPipe_folder}/Lab Summaries/"),
+                                                                  suppress_list_output = FALSE)
+  }
 
   ## 3. Step of Pipeline: merge lab summaries
-  output_list$`Merged Lab Summaries` <- MetaPipe::merge_lab_summaries(data = output_list$`Lab Summaries`$lab_summaries,
-                                                                      output_folder = if (missing(output_folder)) {} else {glue::glue("{MetaPipe_folder}/Merged Lab Summaries/")},
-                                                                      suppress_list_output = FALSE)
+  if (missing(output_folder)) {
+    output_list$`Merged Lab Summaries` <- MetaPipe::merge_lab_summaries(data = output_list$`Lab Summaries`$lab_summaries,
+                                                                        suppress_list_output = FALSE)
+  } else {
+    output_list$`Merged Lab Summaries` <- MetaPipe::merge_lab_summaries(data = output_list$`Lab Summaries`$lab_summaries,
+                                                                        output_folder = glue::glue("{MetaPipe_folder}/Merged Lab Summaries/"),
+                                                                        suppress_list_output = FALSE)
+  }
 
   ## 4. Step of Pipeline: perform meta analyses
 
@@ -105,19 +120,23 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
 
   ## 5. Step of Pipeline: create a data frame for the MetaPipe App
 
+  # reorder data frames
+  merged_lab_summaries <- dplyr::arrange(output_list$`Merged Lab Summaries`$merged_lab_summaries, Replication)
+  meta_analyses <- dplyr::arrange(output_list$`Meta Analyses`, Replication)
+
   # number of labs per replication (= "How many labs are in each replication?")
-  k_per_Replication <- output_list$`Merged Lab Summaries`$merged_lab_summaries %>%
+  k_per_Replication <- merged_lab_summaries %>%
     dplyr::count(.,Replication) %>%
     dplyr::pull(.,n)
 
   # duplication vector (indicates how often replication level column needs to be repeated to match the lab level structure)
-  duplications <- rep(1:nrow(output_list$`Meta Analyses`), k_per_Replication)
+  duplications <- rep(1:nrow(meta_analyses), k_per_Replication)
 
   # expand df
-  expanded_MA <- output_list$`Meta Analyses`[duplications,]
+  expanded_MA <- meta_analyses[duplications,]
 
   # reorder both data frames (so they match) and combine them to create the MetaPipe App data format
-  MetaPipe_Data <- cbind(dplyr::arrange(output_list$`Merged Lab Summaries`$merged_lab_summaries, Replication), dplyr::arrange(expanded_MA, Replication))
+  MetaPipe_Data <- cbind(merged_lab_summaries, expanded_MA)
 
   # add "Lab__Empirical__" to all lab related columns and "MA__" to all meta-analysis columns
   # Lab
