@@ -365,14 +365,18 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
       replication_data <- List_of_Lab_Summaries_per_Replication[[x]]
       project_name <- unique(replication_data$Project)
       replication_name <- unique(replication_data$Replication)
-      write.csv(replication_data, glue::glue("{output_folder}{project_name}_{replication_name}_lab_summaries.csv"))
+      write.csv(replication_data,
+                glue::glue("{output_folder}{project_name}_{replication_name}_lab_summaries.csv"),
+                row.names = FALSE)
     }
     # sorry for the loop, this way I didn't have to struggle with suppressing some output
     for (i in 1:length(List_of_Lab_Summaries_per_Replication)) {
       export_fun(i)
     }
     # export codebook
-    write.csv(codebook, glue::glue("{output_folder}codebook for merged lab summaries.csv"))
+    write.csv(codebook,
+              glue::glue("{output_folder}codebook for merged lab summaries.csv"),
+              row.names = FALSE)
 
   }
 

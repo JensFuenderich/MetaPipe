@@ -11,7 +11,6 @@ full_pipeline(
   Lab = NULL,
   DV = NULL,
   Group = NULL,
-  IV = NULL,
   output_folder,
   folder_name = NULL,
   suppress_list_output = FALSE

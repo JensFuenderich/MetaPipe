@@ -118,8 +118,12 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
   } else {
 
     # export .csv files
-    write.csv(merged_lab_summaries, glue::glue("{output_folder}merged lab summeries.csv"))
-    write.csv(codebook, glue::glue("{output_folder}codebook for merged lab summeries.csv"))
+    write.csv(merged_lab_summaries,
+              glue::glue("{output_folder}merged lab summeries.csv"),
+              row.names = FALSE)
+    write.csv(codebook,
+              glue::glue("{output_folder}codebook for merged lab summeries.csv"),
+              row.names = FALSE)
 
   }
 

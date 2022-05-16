@@ -11,7 +11,7 @@
 #' @import stringr
 #' @export
 #'
-full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, DV = NULL, Group = NULL, IV = NULL, output_folder, folder_name = NULL, suppress_list_output = FALSE){
+full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, DV = NULL, Group = NULL, output_folder, folder_name = NULL, suppress_list_output = FALSE){
 
 
   if (missing(output_folder)) {
@@ -55,8 +55,7 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
              Replication = {{ Replication }},
              Lab = {{ Lab }},
              DV = {{ DV }},
-             Group = {{ Group }},
-             IV = {{ IV }})
+             Group = {{ Group }})
   }
   # applying the function
   Data_List <- lapply(1:length(Data), renamer)
@@ -68,7 +67,9 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
   export_ipd_fun <- function(x){
     project_name <- unique(x$Project)
     replication_name <- unique(x$Replication)
-    write.csv(x, file = glue::glue("{MetaPipe_folder}/Individual Participant Data/{project_name}_{replication_name}_individual_participant_data.csv"))
+    write.csv(x,
+              file = glue::glue("{MetaPipe_folder}/Individual Participant Data/{project_name}_{replication_name}_individual_participant_data.csv"),
+              row.names = FALSE)
   }
   # apply function
   if (missing(output_folder)) {} else { lapply(Data_List, export_ipd_fun) }
@@ -76,7 +77,7 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
   ## create codebook for individual participant data
   codebook_ipd <- c()
   # # export codebook for individual participant data
-  # write.csv(codebook_ipd, glue::glue("{MetaPipe_folder}/Individual Participant Data/codebook for individual participant data.csv"))
+  # write.csv(codebook_ipd, glue::glue("{MetaPipe_folder}/Individual Participant Data/codebook for individual participant data.csv"), col.names = FALSE)
 
   # add to the output list for step 1 of the pipeline
   output_list$`Individual Participant Data` <- list(Data_List, codebook_ipd)
@@ -91,7 +92,6 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
                                                                   Lab = {{Lab}},
                                                                   DV = {{DV}},
                                                                   Group = {{Group}},
-                                                                  IV = {{IV}},
                                                                   suppress_list_output = FALSE)
   } else {
     output_list$`Lab Summaries` <- MetaPipe::create_lab_summaries(data = Data,
@@ -100,7 +100,6 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
                                                                   Lab = {{Lab}},
                                                                   DV = {{DV}},
                                                                   Group = {{Group}},
-                                                                  IV = {{IV}},
                                                                   output_folder = glue::glue("{MetaPipe_folder}/Lab Summaries/"),
                                                                   suppress_list_output = FALSE)
   }
@@ -120,7 +119,9 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
   output_list$`Meta Analyses` <- MetaPipe::meta_analyses(output_list$`Merged Lab Summaries`$merged_lab_summaries)
   # export data
   if (missing(output_folder)) {} else {
-  write.csv(output_list$`Meta Analyses`, glue::glue("{MetaPipe_folder}/Meta Analyses/meta analyses.csv"))
+  write.csv(output_list$`Meta Analyses`,
+            glue::glue("{MetaPipe_folder}/Meta Analyses/meta analyses.csv"),
+            row.names = FALSE)
   }
 
   ## 5. Step of Pipeline: create a data frame for the MetaPipe App
@@ -155,9 +156,10 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
   last_lab_MA <- ncol(MetaPipe_Data)
   names(MetaPipe_Data)[first_lab_MA:last_lab_MA] <- stringr::str_c("MA__", names(MetaPipe_Data[,first_lab_MA:last_lab_MA]))
 
-  # delete duplicate columns
+  # delete duplicate/redundant columns
   MetaPipe_Data$MA__Project <- NULL
   MetaPipe_Data$MA__Replication <- NULL
+  base::rownames(MetaPipe_Data) <- NULL
 
   # add to output list
   MetaPipe_Data_list <- list(MetaPipe_Data)
@@ -166,7 +168,9 @@ full_pipeline <- function(Data, Project = NULL, Replication = NULL, Lab = NULL, 
 
   # export data
   if (missing(output_folder)) {} else {
-    write.csv(output_list$MetaPipe_Data, glue::glue("{MetaPipe_folder}/Meta Pipe/MetaPipe_Data.csv"))
+    write.csv(output_list$MetaPipe_Data,
+              glue::glue("{MetaPipe_folder}/Meta Pipe/MetaPipe_Data.csv"),
+              row.names = FALSE)
   }
 
   if (suppress_list_output == TRUE) {
