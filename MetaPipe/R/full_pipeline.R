@@ -1,6 +1,11 @@
 #' Full Pipeline Function
 #'
 #'
+#' @description Some description
+#'
+#' @param Project Character value with the name of...
+#' @param Data List of data frames.
+#'
 #' @import glue
 #' @import dplyr
 #' @import stringr

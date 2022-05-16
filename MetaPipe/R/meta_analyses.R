@@ -88,10 +88,14 @@ meta_analyses <- function(data){
       "QEp__SMD"
     )
 
+
     # create a df for the results of the analysis from the subset
     Replication.df <- data.frame(t(rep(0,length(col_names))))
     # rename columns
     names(Replication.df) <- col_names
+
+    ## replace infinite values (Inf) in input df with NA
+    subset_Replication <- do.call(data.frame, lapply(subset_Replication, function(value){replace(value, is.infinite(value),NA)}))
 
     ## insert information on sample sizes and number of labs
 

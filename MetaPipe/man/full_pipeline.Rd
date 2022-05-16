@@ -17,6 +17,11 @@ full_pipeline(
   suppress_list_output = FALSE
 )
 }
+\arguments{
+\item{Data}{List of data frames.}
+
+\item{Project}{Character value with the name of...}
+}
 \description{
-Full Pipeline Function
+Some description
 }
