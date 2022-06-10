@@ -4,8 +4,70 @@
 \alias{meta_analyses}
 \title{Meta Analyses}
 \usage{
-meta_analyses(data)
+meta_analyses(
+  data,
+  output_folder,
+  suppress_list_output = FALSE,
+  method = "REML"
+)
+}
+\arguments{
+\item{data}{The function expects the input to be a data frame. The input may either be the data frame produced by the MetaPipe::merge_lab_summaries() function, or one with the same columns names. A template of this data frame is available at \link{OSF LINK}, as is a codebook for unambiguous identification of the abbreviations:  \link{OSF LINK}.}
+
+\item{output_folder}{???}
+
+\item{suppress_list_output}{???}
+
+\item{method}{A character string to specify the type of model to be fittet. Default ist “REML”. For more details, refer to the metafor documentation.}
+}
+\value{
+The output is a list with two objects: A data frame with the meta-analytical results and a codebook for unambiguous identification of its columns.
+\subsection{meta analyses}{
+
+The data frame contains information to identify each analysis (Project, Replication) and statistical output from the seven meta-analyses per replication. The statistical output for each meta-analysis includes:
+\itemize{
+\item{A model estimate for the y of interest (Model_Estimate__).}
+\item{The number of labs included in the analysis (Empirical__K).}
+\item{The estimated \mjeqn{\tau^2}{} (sigma2 from the rma.mv object) value (Tau2__).}
+\item{The estimated \mjeqn{\tau}{} (the square root of the sigma2 from the rma.mv object) value (Tau2__).}
+\item{The estimated \mjeqn{I^2}{} value. \mjeqn{I^2}{} is not part of the rma.mv output object and has to be calculated from \mjeqn{\tau}{}.
+\mjdeqn{ I^2 = 100 \frac{ \hat{\tau}^2  }{ \hat{\tau}^2 + \tilde{v}} }{}
+with
+\mjdeqn{ \tilde{v} = \frac{(k-1)\sum w\underscore{i}}{\left(\sum  w\underscore{i}\right)-\sum w\underscore{i}^2} }{}
+Transformation according to: https://wviechtb.github.io/metafor/reference/print.rma.html
+}
+\item{The estimated \mjeqn{H^2}{} value. \mjeqn{H^2}{} is not part of the rma.mv output object and has to be calculated from \mjeqn{\tau}{}.
+\mjdeqn{ H^2 = 100 \frac{ \hat{\tau}^2 + \tilde{v} }{\tilde{v}} }{}
+with
+\mjdeqn{ \tilde{v} = \frac{(k-1)\sum w\underscore{i}}{\left(\sum  w\underscore{i}\right)-\sum w\underscore{i}^2} }{}
+}
+\item{The Q statistic (QE__).}
+\item{The p-value from the test on the Q statistic (QEp__).}
+}
+}
+
+\subsection{codebook}{
+
+A codebook that applies to the data frame (meta_analyses).
+}
 }
 \description{
-Meta Analyses
+\loadmathjax{}
+\(\let\underscore_\)
+Function to run meta-analyses one the standardized mean difference and its components. The meta-analyses are \cr
+\link{...} \cr
+This function is the first step of the MetaPipe pipeline. For more details on the pipeline, refer to the documentation of the MetaPipe-package.
+}
+\details{
+All meta-analyses within the function are written with metafor::rma.mv. The multivariate version of the rma function is deployed to enable the use of sparse matrices (“sparse = TRUE”) for optimal performance, where possible. They are fitted as a random-effects model with “random = ~ 1 | Lab” and a restricted maximum likelihood estimation (“REML”).
+The function runs seven meta-analyses per replication:
+\itemize{
+\item{treatment mean (yi = T_M, sei = SE_T_M)}
+\item{control mean (yi = C_M, sei = SE_C_M)}
+\item{treatment standard deviation (yi = T_SD, sei = SE_T_SD)}
+\item{control standard deviation (yi = C_SD, sei = SE_C_SD)}
+\item{mean difference (yi = MD, sei = SE_MD)}
+\item{pooled standard deviation (yi = pooled_SD, sei = SE_pooled_SD)}
+\item{standardized mean difference (yi = SMD, sei = SE_SMD)}
+}
 }

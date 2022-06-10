@@ -9,15 +9,30 @@ merge_lab_summaries(data, output_folder, suppress_list_output = FALSE)
 \arguments{
 \item{data}{Either a list object or a path to a folder containing the lab summaries.}
 
-\item{output_folder}{define a path to which the merged lab summaries and the codebook are exported.}
+\item{output_folder}{Define a path to which the merged lab summaries and the codebook are exported. If no path is specified, results are returned only in R.}
 
-\item{suppress_list_output}{a logical indicating whether results should be returned in R.}
+\item{suppress_list_output}{A logical indicating whether results should be returned in R. If TRUE, no output is returned in R.}
 }
 \value{
-If all .csv files or list elements from the data input of the function are named coherently, the function returns a list with two elements (merged df & codebook) and optionally a folder (in case output_path is specified)
+A list object containing the following components: \cr
+\subsection{merged_lab_summaries}{
+
+A data frame with all replications from the input.
+}
+
+\subsection{codebook}{
+
+A codebook that applies to the data frame (merged_lab_summaries). \cr
+In order to export the data structure as .csv files in a folder, output_folder has to be specified.
+}
 }
 \description{
-Some description of the function
+\loadmathjax{}
+\(\let\underscore_\)
+Function to merge the lab statistics returned by MetaPipe::create_lab_summaries() into a single data frame. This function is the second step of the MetaPipe pipeline. For more details on the pipeline, refer to the documentation of the MetaPipe-package.
+}
+\details{
+No transformations are performed on the data in this step of the MetaPipe pipeline.
 }
 \examples{
 ## Example with a list object (number of columns drastically reduced for illustration)

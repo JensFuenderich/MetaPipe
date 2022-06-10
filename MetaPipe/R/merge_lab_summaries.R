@@ -1,15 +1,36 @@
 #' Merging Lab Summaries
 #'
-#' @description Some description of the function
-#' @param data Either a list object or a path to a folder containing the lab summaries.
-#' @param output_folder define a path to which the merged lab summaries and the codebook are exported.
-#' @param suppress_list_output a logical indicating whether results should be returned in R.
 #' @import readr
 #' @import dplyr
 #' @import glue
 #' @import utils
+#'
+#'
+#' @description
+#' \loadmathjax{}
+#' \(\let\underscore_\)
+#' Function to merge the lab statistics returned by MetaPipe::create_lab_summaries() into a single data frame. This function is the second step of the MetaPipe pipeline. For more details on the pipeline, refer to the documentation of the MetaPipe-package.
+#'
+#' @param data
+#' Either a list object or a path to a folder containing the lab summaries.
+#' @param output_folder
+#' Define a path to which the merged lab summaries and the codebook are exported. If no path is specified, results are returned only in R.
+#' @param suppress_list_output
+#' A logical indicating whether results should be returned in R. If TRUE, no output is returned in R.
+#'
+#' @details
+#' No transformations are performed on the data in this step of the MetaPipe pipeline.
+#'
 #' @return
-#' If all .csv files or list elements from the data input of the function are named coherently, the function returns a list with two elements (merged df & codebook) and optionally a folder (in case output_path is specified)
+#' A list object containing the following components: \cr
+#' ## merged_lab_summaries
+#' A data frame with all replications from the input.
+#'
+#' ## codebook
+#' A codebook that applies to the data frame (merged_lab_summaries). \cr
+#' In order to export the data structure as .csv files in a folder, output_folder has to be specified.
+#'
+#'
 #' @export
 #'
 #' @examples
@@ -19,7 +40,7 @@
 #' # returns a list with the "merged lab summaries" and the "codebook"
 merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALSE){
 
-  ## Merge lab summaries
+  ### Merge lab summaries
 
   if (is.list(data) == TRUE) {
 
@@ -46,7 +67,7 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
 
   }
 
-  ## Create codebook
+  ### Create codebook
 
   if (is.list(data) != TRUE && file.exists(data) != TRUE) {
 
@@ -95,17 +116,14 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
       gsub(abbr_library$Abbreviation[9], abbr_library$`Full Name`[9], .) %>%
       gsub(abbr_library$Abbreviation[10], abbr_library$`Full Name`[10], .) %>%
       gsub(abbr_library$Abbreviation[11], abbr_library$`Full Name`[11], .) %>%
-      gsub(abbr_library$Abbreviation[12], abbr_library$`Full Name`[12], .) %>%
-      gsub(abbr_library$Abbreviation[13], abbr_library$`Full Name`[13], .) %>%
-      gsub(abbr_library$Abbreviation[14], abbr_library$`Full Name`[14], .)
+      gsub(abbr_library$Abbreviation[12], abbr_library$`Full Name`[12], .)
 
     description_vector <- stringr::str_replace_all(description_vector, "_", " ")
 
-    codebook <- data.frame(Variable_Name = names(merged_lab_summaries), Variable_Description = description_vector)
-    codebook <- codebook[-c(1:2),]
+    codebook_for_merged_lab_summeries <- data.frame(Variable_Name = names(merged_lab_summaries), Variable_Description = description_vector)
 
     # do this one by hand, otherwise the abbr "MD" messes up the code
-    codebook[codebook$Variable_Name == "MD",2] <- "mean difference"
+    codebook_for_merged_lab_summeries[codebook_for_merged_lab_summeries$Variable_Name == "MD",2] <- "mean difference"
 
   }
 
@@ -119,10 +137,10 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
 
     # export .csv files
     write.csv(merged_lab_summaries,
-              glue::glue("{output_folder}merged lab summeries.csv"),
+              glue::glue("{output_folder}merged_lab_summeries.csv"),
               row.names = FALSE)
-    write.csv(codebook,
-              glue::glue("{output_folder}codebook for merged lab summeries.csv"),
+    write.csv(codebook_for_merged_lab_summeries,
+              glue::glue("{output_folder}codebook_for_merged_lab_summeries.csv"),
               row.names = FALSE)
 
   }
@@ -134,10 +152,10 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
   } else if (suppress_list_output == FALSE) {
 
     # create list output
-    output <- list(merged_lab_summaries, codebook)
+    output <- list(merged_lab_summaries, codebook_for_merged_lab_summeries)
 
     # rename list elements
-    names(output) <- c("merged_lab_summaries", "codebook")
+    names(output) <- c("merged_lab_summaries", "codebook_for_merged_lab_summeries")
 
     # return the output (function aborts here)
     return(output)

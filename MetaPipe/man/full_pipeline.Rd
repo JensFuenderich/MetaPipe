@@ -5,22 +5,46 @@
 \title{Full Pipeline Function}
 \usage{
 full_pipeline(
-  Data,
+  data,
   Project = NULL,
   Replication = NULL,
   Lab = NULL,
   DV = NULL,
   Group = NULL,
-  output_folder,
+  output_path,
   folder_name = NULL,
-  suppress_list_output = FALSE
+  suppress_list_output = FALSE,
+  method = "REML"
 )
 }
 \arguments{
-\item{Data}{List of data frames.}
+\item{data}{A list of data frames that contain the individual participant data. The function expects the relevant columns to be named consistently across all list objects. Relevant to this function are columns that represent information on the project (e.g., Many Labs 2), the replication (e.g., Ross1), the lab (the source a data point is assigned to), the group (either the treatment or control condition) and the single data point of the dependent variable per person.}
 
-\item{Project}{Character value with the name of...}
+\item{Project}{Character vector with the name of the columns in the list elements of "data" that contain the project name(s). If \emph{is.null(Project) == TRUE}, "Project" is chosen as the default.}
+
+\item{Replication}{Character vector with the name of the columns in the list elements of "data" that contain the replication name(s). If \emph{is.null(Replication) == TRUE}, "Replication" is chosen as the default. Each replication comprises a single effect with direct replications across multiple labs/sources.}
+
+\item{Lab}{Character vector with the name of the columns in the list elements of "data" that contain the lab names. If \emph{is.null(Lab) == TRUE}, "Lab" is chosen as the default. The meta-analyses in MetaPipe::meta_analyses() and MetaPipe::full_pipeline() are run as random effects models in metafor::rma.mv() with “random = ~ 1 | Lab”. Thus, the pipeline assumes a distribution of true statistics (e.g., treatment means, mean differences, standardized mean differences).}
+
+\item{DV}{Character vector with the name of the columns in the list elements of "data" that contain the (aggregated) dependent variable. If \emph{is.null(DV) == TRUE}, "DV" is chosen as the default.}
+
+\item{Group}{Character vector with the name of the columns in the list elements of "data" that contain the (treatment/control) group identification. If \emph{is.null(Group) == TRUE}, "Group" is chosen as the default. These should only contain values of 0 (control group), 1 (treatment group) and NA (unidentified).}
+
+\item{output_path}{Specify the output path for the full documentation of the MetaPipe pipeline. For an example please refer to \link{OSF Link}. If no folder is specified, the function will return its output only to the R environment (unless this is suppressed under suppress_list_output).}
+
+\item{folder_name}{Optional character string to assign a custom name to the output folder. When folder_name is not specified, the folder name is set to “MetaPipe Output”.}
+
+\item{suppress_list_output}{Logical. FALSE by default. If FALSE, the function will return a list output to the environment, containing the lab summaries and the codebook. If TRUE, these are not returned to the environment.}
+
+\item{method}{Optional argument to specify the estimation method of the meta-analyses (the default is “REML”). For more information, please refer to the documentation of the metafor package.}
+}
+\value{
+Etwas über den Output
 }
 \description{
-Some description
+\loadmathjax{}
+\(\let\underscore_\)
+}
+\details{
+Pipeline Struktur und Verweise auf die anderen Befehl-Dokus
 }

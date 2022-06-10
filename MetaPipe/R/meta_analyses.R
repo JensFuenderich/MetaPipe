@@ -4,14 +4,80 @@
 #' @import metafor
 #' @import purrr
 #' @import dplyr
+#' @import mathjaxr
+#'
+#' @description
+#' \loadmathjax{}
+#' \(\let\underscore_\)
+#' Function to run meta-analyses one the standardized mean difference and its components. The meta-analyses are \cr
+#' [...] \cr
+#' This function is the first step of the MetaPipe pipeline. For more details on the pipeline, refer to the documentation of the MetaPipe-package.
+#'
+#'
+#' @param data
+#' The function expects the input to be a data frame. The input may either be the data frame produced by the MetaPipe::merge_lab_summaries() function, or one with the same columns names. A template of this data frame is available at [OSF LINK], as is a codebook for unambiguous identification of the abbreviations:  [OSF LINK].
+#' @param output_folder
+#' ???
+#' @param suppress_list_output
+#' ???
+#' @param method
+#' A character string to specify the type of model to be fittet. Default ist “REML”. For more details, refer to the metafor documentation.
+#'
+#' @details
+#'
+#' All meta-analyses within the function are written with metafor::rma.mv. The multivariate version of the rma function is deployed to enable the use of sparse matrices (“sparse = TRUE”) for optimal performance, where possible. They are fitted as a random-effects model with “random = ~ 1 | Lab” and a restricted maximum likelihood estimation (“REML”).
+#' The function runs seven meta-analyses per replication:
+#' \itemize{
+  #'  \item{treatment mean (yi = T_M, sei = SE_T_M)}
+  #'  \item{control mean (yi = C_M, sei = SE_C_M)}
+  #'  \item{treatment standard deviation (yi = T_SD, sei = SE_T_SD)}
+  #'  \item{control standard deviation (yi = C_SD, sei = SE_C_SD)}
+  #'  \item{mean difference (yi = MD, sei = SE_MD)}
+  #'  \item{pooled standard deviation (yi = pooled_SD, sei = SE_pooled_SD)}
+  #'  \item{standardized mean difference (yi = SMD, sei = SE_SMD)}
+#'  }
+#'
+#'
+#' @return
+#' The output is a list with two objects: A data frame with the meta-analytical results and a codebook for unambiguous identification of its columns.
+#' ## meta analyses
+#' The data frame contains information to identify each analysis (Project, Replication) and statistical output from the seven meta-analyses per replication. The statistical output for each meta-analysis includes:
+#' \itemize{
+  #' \item{A model estimate for the y of interest (Model_Estimate__).}
+  #' \item{The number of labs included in the analysis (Empirical__K).}
+  #' \item{The estimated \mjeqn{\tau^2}{} (sigma2 from the rma.mv object) value (Tau2__).}
+  #' \item{The estimated \mjeqn{\tau}{} (the square root of the sigma2 from the rma.mv object) value (Tau2__).}
+  #' \item{The estimated \mjeqn{I^2}{} value. \mjeqn{I^2}{} is not part of the rma.mv output object and has to be calculated from \mjeqn{\tau}{}.
+  #' \mjdeqn{ I^2 = 100 \frac{ \hat{\tau}^2  }{ \hat{\tau}^2 + \tilde{v}} }{}
+  #' with
+  #' \mjdeqn{ \tilde{v} = \frac{(k-1)\sum w\underscore{i}}{\left(\sum  w\underscore{i}\right)-\sum w\underscore{i}^2} }{}
+  #' Transformation according to: https://wviechtb.github.io/metafor/reference/print.rma.html
+  #' }
+  #' \item{The estimated \mjeqn{H^2}{} value. \mjeqn{H^2}{} is not part of the rma.mv output object and has to be calculated from \mjeqn{\tau}{}.
+  #' \mjdeqn{ H^2 = 100 \frac{ \hat{\tau}^2 + \tilde{v} }{\tilde{v}} }{}
+  #' with
+  #' \mjdeqn{ \tilde{v} = \frac{(k-1)\sum w\underscore{i}}{\left(\sum  w\underscore{i}\right)-\sum w\underscore{i}^2} }{}
+  #' }
+  #' \item{The Q statistic (QE__).}
+  #' \item{The p-value from the test on the Q statistic (QEp__).}
+#' }
+#' ## codebook
+#' A codebook that applies to the data frame (meta_analyses).
+#'
 #' @export
 #'
+
+
+
+
 ## aktuell produziert die Funktion eine genestete Liste und ein df, ich nehme aber nur das df als Output
 
-meta_analyses <- function(data){
+meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, method = "REML"){
 
   ## input is a large df with all projects & replications
 
+
+  ### Run meta-analyses
 
   ## create a function that runs all meta-analyses for one replication/effect
 
@@ -135,7 +201,7 @@ meta_analyses <- function(data){
       Het_T_M <- metafor::rma.mv(yi = T_M,
                                  V = SE_T_M^2,
                                  random = ~ 1 | Lab,
-                                 method = "REML",
+                                 method = method,
                                  sparse = TRUE,
                                  data = na.omit(subset_Replication[, c("Lab", "T_M", "SE_T_M")]))
       # v estimate for calculating I2 and H2
@@ -161,7 +227,8 @@ meta_analyses <- function(data){
       # run the meta-analysis
       Het_C_M <- metafor::rma.mv(yi = C_M,
                                  V = SE_C_M^2, random = ~ 1 | Lab,
-                                 method = "REML", sparse = TRUE,
+                                 method = method,
+                                 sparse = TRUE,
                                  data = na.omit(subset_Replication[, c("Lab", "C_M", "SE_C_M")]))
       # v estimate for calculating I2 and H2
       v_estimate <- v_est_fct(rma_mv_obj = Het_C_M,
@@ -185,7 +252,7 @@ meta_analyses <- function(data){
       Het_T_SD <- metafor::rma.mv(yi = T_SD,
                                   V = SE_T_SD^2,
                                   random = ~ 1 | Lab,
-                                  method = "REML",
+                                  method = method,
                                   sparse = TRUE,
                                   data = na.omit(subset_Replication[, c("Lab", "T_SD", "SE_T_SD")]))
       # v estimate for calculating I2 and H2
@@ -210,7 +277,7 @@ meta_analyses <- function(data){
       Het_C_SD <- metafor::rma.mv(yi = C_SD,
                                   V = SE_C_SD^2,
                                   random = ~ 1 | Lab,
-                                  method = "REML",
+                                  method = method,
                                   sparse = TRUE,
                                   data = na.omit(subset_Replication[, c("Lab", "C_SD", "SE_C_SD")]))
       # v estimate for calculating I2 and H2
@@ -234,7 +301,8 @@ meta_analyses <- function(data){
       # run the meta-analysis
       Het_MD <- metafor::rma.mv(yi = MD, V = SE_MD^2,
                                 random = ~ 1 | Lab,
-                                method = "REML", sparse = TRUE,
+                                method = method,
+                                sparse = TRUE,
                                 data = na.omit(subset_Replication[, c("Lab", "MD", "SE_MD")]))
       # v estimate for calculating I2 and H2
       v_estimate <- v_est_fct(rma_mv_obj = Het_MD,
@@ -258,7 +326,7 @@ meta_analyses <- function(data){
       Het_pooled_SD <- metafor::rma.mv(yi = pooled_SD,
                                        V = SE_pooled_SD^2,
                                        random = ~ 1 | Lab,
-                                       method = "REML",
+                                       method = method,
                                        sparse = TRUE,
                                        data = na.omit(subset_Replication[, c("Lab", "pooled_SD", "SE_pooled_SD")]))
       # v estimate for calculating I2 and H2
@@ -284,7 +352,7 @@ meta_analyses <- function(data){
       Het_SMD <- metafor::rma.mv(yi = SMD,
                                    V = SE_SMD^2,
                                    random = ~ 1 | Lab,
-                                   method = "REML",
+                                   method = method,
                                    sparse = TRUE,
                                    data = na.omit(subset_Replication[, c("Lab", "SMD", "SE_SMD")]))
       # v estimate for calculating I2 and H2
@@ -325,8 +393,106 @@ meta_analyses <- function(data){
 
   names(nested_list_output) <- names(data_list_Project_split)
 
-  df_output <- dplyr::bind_rows(lapply(1:length(nested_list_output), function(x){dplyr::bind_rows(nested_list_output[[x]])}))
+  meta_analyses <- dplyr::bind_rows(lapply(1:length(nested_list_output), function(x){dplyr::bind_rows(nested_list_output[[x]])}))
 
-  return(df_output)
+  ### Create codebook
+
+  # create empty df
+  abbr_library <- data.frame(Abbreviation = logical(0),
+                             Full_Name = logical(0))
+
+  # pair abbreviations with verbal descriptions
+  abbr_library <- as.data.frame(base::rbind(c("_T_", "__treatment group_"),
+                                            c("_C_", "__control group_"),
+                                            c("_N", "_number of participants"),
+                                            c("_K", "_number of labs"),
+                                            c("_MD", "_mean difference"),
+                                            c("_Model_Estimate_", "_model estimate for_"),
+                                            c("_M", "_mean"),
+                                            c("_SD", "_standard deviation"),
+                                            c("__SE_", "__standard error of the_"),
+                                            c("_SMD", "_standardized mean difference"),
+                                            c("MA__", "meta analysis level:__"),
+                                            c("__pooled_", "__pooled_"),
+                                            c("Lab__", "lab level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
+                                            c("__I2_", "__I2 for_"),
+                                            c("__H2_", "__H2 for_"),
+                                            c("__QE_", "__QE for_"),
+                                            c("__QEp_", "__QEp for_")
+  ))
+
+  # rename columns of df
+  names(abbr_library) <- c("Abbreviation", "Full Name")
+
+  # extract names from merged df
+  description_vector <- names(meta_analyses)
+
+  # sorry for this, did not want to loop
+  # check if there's enough pipes in that orchestra
+  #nrow(abbr_library) (the result of this should be equivalent to the max indexing in the following chunk)
+
+
+  description_vector %<>% # pipe from magrittr
+    gsub(abbr_library$Abbreviation[1], abbr_library$`Full Name`[1], .) %>%
+    gsub(abbr_library$Abbreviation[2], abbr_library$`Full Name`[2], .) %>%
+    gsub(abbr_library$Abbreviation[3], abbr_library$`Full Name`[3], .) %>%
+    gsub(abbr_library$Abbreviation[4], abbr_library$`Full Name`[4], .) %>%
+    gsub(abbr_library$Abbreviation[5], abbr_library$`Full Name`[5], .) %>%
+    gsub(abbr_library$Abbreviation[6], abbr_library$`Full Name`[6], .) %>%
+    gsub(abbr_library$Abbreviation[7], abbr_library$`Full Name`[7], .) %>%
+    gsub(abbr_library$Abbreviation[8], abbr_library$`Full Name`[8], .) %>%
+    gsub(abbr_library$Abbreviation[9], abbr_library$`Full Name`[9], .) %>%
+    gsub(abbr_library$Abbreviation[10], abbr_library$`Full Name`[10], .) %>%
+    gsub(abbr_library$Abbreviation[11], abbr_library$`Full Name`[11], .) %>%
+    gsub(abbr_library$Abbreviation[12], abbr_library$`Full Name`[12], .) %>%
+    gsub(abbr_library$Abbreviation[13], abbr_library$`Full Name`[13], .) %>%
+    gsub(abbr_library$Abbreviation[14], abbr_library$`Full Name`[14], .) %>%
+    gsub(abbr_library$Abbreviation[15], abbr_library$`Full Name`[15], .) %>%
+    gsub(abbr_library$Abbreviation[16], abbr_library$`Full Name`[16], .) %>%
+    gsub(abbr_library$Abbreviation[17], abbr_library$`Full Name`[17], .)
+
+  description_vector <- stringr::str_replace_all(description_vector, "__Empirical__", "_")
+
+  description_vector <- stringr::str_replace_all(description_vector, "___", "_")
+  description_vector <- stringr::str_replace_all(description_vector, "__", "_")
+  description_vector <- stringr::str_replace_all(description_vector, "_", " ")
+
+  codebook_for_meta_analyses <- data.frame(Variable_Name = names(meta_analyses), Variable_Description = description_vector)
+
+  ## Outputs
+
+  if (missing(output_folder)) {
+
+    print("You chose not to export the data as .csv files.")
+
+  } else {
+
+    # export .csv files
+    write.csv(meta_analyses,
+              glue::glue("{output_folder}meta analyses.csv"),
+              row.names = FALSE)
+    write.csv(codebook_for_meta_analyses,
+              glue::glue("{output_folder}codebook for meta analyses.csv"),
+              row.names = FALSE)
+
+  }
+
+  if (suppress_list_output == TRUE) {
+
+    print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
+
+  } else if (suppress_list_output == FALSE) {
+
+    # create list output
+    output <- list(meta_analyses, codebook_for_meta_analyses)
+
+    # rename list elements
+    names(output) <- c("meta_analyses", "codebook_for_meta_analyses")
+
+    # return the output (function aborts here)
+    return(output)
+
+  }
+
 
 }
