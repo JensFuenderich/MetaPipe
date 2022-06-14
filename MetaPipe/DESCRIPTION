@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Jens", "Fuenderich", , "jens.fuenderich@uni-erfurt.de", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: This package needs a description.
+Description: is a tool to provide structure to the meta-analytical-analyses of multi-lab replication projects. A flowchart that depicts the whole process is available at https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary%20Material/MetaPipe%20Flow%20Chart.pdf The dark blue blocks are .csv files. The dark green blocks each refer to a step in the pipeline that is performed by a MetaPipe function. MetaPipe::full_pipeline() performs all of these steps and returns "MetaPipe_Data.csv" which may be provided to the MetaPipe App for handy data selection and basic plotting of the analysis results. For an example of the MetaPipe Output structure, please refer to https://github.com/JensFuenderich/MetaPipe/tree/main/Supplementary%20Material/Table%20Templates
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

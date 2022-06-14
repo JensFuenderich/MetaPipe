@@ -32,10 +32,22 @@
 #'
 #' @details
 #'
+#' ## General notes on the pipeline
+#'
 #' The MetaPipe pipeline is a tool to provide structure to the meta-analytical-analyses of multi-lab replication projects. A flowchart that depicts the whole process is available at https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary%20Material/MetaPipe%20Flow%20Chart.pdf
 #' The dark blue blocks are .csv files. The dark green blocks each refer to a step in the pipeline that is performed by a MetaPipe function. MetaPipe::full_pipeline() performs all of these steps and returns "MetaPipe_Data.csv" which may be provided to the MetaPipe App for handy data selection and basic plotting of the analysis results.
 #' For an example of the MetaPipe Output structure, please refer to https://github.com/JensFuenderich/MetaPipe/tree/main/Supplementary%20Material/Table%20Templates
 #'
+#' ## full_pipeline
+#'
+#' This function executes the pipeline as follows:
+#'
+#' \itemize{
+#'  \item{MetaPipe::create_lab_summaries()} \cr
+#'  \item{MetaPipe::merge_lab_summaries} \cr
+#'  \item{MetaPipe::meta_analyses()} \cr
+#'  \item{merging lab- and meta-level data to achieve MetaPipe data format} \cr
+#' }
 #'
 #' @return
 #'
