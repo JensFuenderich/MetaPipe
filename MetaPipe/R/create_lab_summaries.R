@@ -8,6 +8,7 @@
 #' @import utils
 #' @import tibble
 #' @import mathjaxr
+#' @import stats
 #'
 #'
 #' @description
@@ -232,11 +233,14 @@
 #' The function create_lab_summaries returns a list consisting of two elements: A codebook and a list of data frames. Each data frame contains all lab summary statistics for the according Replication/Effect.
 #' The summary statistics returned (including their standard error) are the means and standard deviations for control and experimental groups, pooled standard deviations, raw mean differences and standardized mean differences (Hedge's g according to Borenstein).
 #'
-#' @examples
-#' ## I don't know yet
+#' #### Example
+#'
+#' For an example, please refer to the github repository:
+#' https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary%20Material/Code%20Examples/create_lab_summaries().R
+#'
 #'
 #' @export
-#'
+
 create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab = NULL, DV = NULL, Group = NULL, output_folder, suppress_list_output = FALSE){
 
   ## use standard column names in case is.null("column name") == TRUE

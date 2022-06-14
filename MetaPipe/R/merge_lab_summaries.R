@@ -30,14 +30,13 @@
 #' A codebook that applies to the data frame (merged_lab_summaries). \cr
 #' In order to export the data structure as .csv files in a folder, output_folder has to be specified.
 #'
+#' #### Example
+#'
+#' For an example, please refer to the github repository:
+#' https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary%20Material/Code%20Examples/merge_lab_summaries().R
 #'
 #' @export
-#'
-#' @examples
-#' ## Example with a list object (number of columns drastically reduced for illustration)
-#' test_list <- list(data.frame(Project = c(1,1), Replication = c(1,1), Lab = c(1,2), T_M = c(0.5, 0.7)),  data.frame(Project = c(1,1), Replication = c(2,2), Lab = c(1,2), T_M = c(3, 5)))
-#' merge_lab_summaries(data = test_list)
-#' # returns a list with the "merged lab summaries" and the "codebook"
+
 merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALSE){
 
   ### Merge lab summaries

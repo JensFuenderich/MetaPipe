@@ -12,11 +12,11 @@ meta_analyses(
 )
 }
 \arguments{
-\item{data}{The function expects the input to be a data frame. The input may either be the data frame produced by the MetaPipe::merge_lab_summaries() function, or one with the same columns names. A template of this data frame is available at \link{OSF LINK}, as is a codebook for unambiguous identification of the abbreviations:  \link{OSF LINK}.}
+\item{data}{The function expects the input to be a data frame. The input may either be the data frame produced by the MetaPipe::merge_lab_summaries() function, or one with the same columns names. A template of this data frame is available at https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary\%20Material/Table\%20Templates/Merged\%20Lab\%20Summaries/merged_lab_summeries.csv, as is a codebook for unambiguous identification of the abbreviations: https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary\%20Material/Table\%20Templates/Merged\%20Lab\%20Summaries/codebook_for_merged_lab_summeries.csv}
 
-\item{output_folder}{???}
+\item{output_folder}{Specify the output folder for the summaries and the codebook. If no folder is specified, the function will return its output only to the R environment (unless this is suppressed under suppress_list_output).}
 
-\item{suppress_list_output}{???}
+\item{suppress_list_output}{A logical indicating whether results should be returned in R. If TRUE, no output is returned in R.}
 
 \item{method}{A character string to specify the type of model to be fittet. Default ist “REML”. For more details, refer to the metafor documentation.}
 }
@@ -49,6 +49,12 @@ with
 \subsection{codebook}{
 
 A codebook that applies to the data frame (meta_analyses).
+\subsection{Example}{
+
+For an example, please refer to the github repository:
+https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary\%20Material/Code\%20Examples/meta_analyses().R
+}
+
 }
 }
 \description{

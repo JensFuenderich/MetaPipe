@@ -35,6 +35,11 @@ create_lab_summaries(
 \value{
 The function create_lab_summaries returns a list consisting of two elements: A codebook and a list of data frames. Each data frame contains all lab summary statistics for the according Replication/Effect.
 The summary statistics returned (including their standard error) are the means and standard deviations for control and experimental groups, pooled standard deviations, raw mean differences and standardized mean differences (Hedge's g according to Borenstein).
+\subsection{Example}{
+
+For an example, please refer to the github repository:
+https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary\%20Material/Code\%20Examples/create_lab_summaries().R
+}
 }
 \description{
 \loadmathjax{}
@@ -264,8 +269,4 @@ with
 }
 }
 }
-}
-\examples{
-## I don't know yet
-
 }

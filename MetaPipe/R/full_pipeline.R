@@ -22,7 +22,7 @@
 #' @param Group
 #' Character vector with the name of the columns in the list elements of "data" that contain the (treatment/control) group identification. If \emph{is.null(Group) == TRUE}, "Group" is chosen as the default. These should only contain values of 0 (control group), 1 (treatment group) and NA (unidentified).
 #' @param output_path
-#' Specify the output path for the full documentation of the MetaPipe pipeline. For an example please refer to [OSF Link]. If no folder is specified, the function will return its output only to the R environment (unless this is suppressed under suppress_list_output).
+#' Specify the output path for the full documentation of the MetaPipe pipeline. For an example of the exported structure please refer to https://github.com/JensFuenderich/MetaPipe/tree/main/Supplementary%20Material/Table%20Templates. If no folder is specified, the function will return its output only to the R environment (unless this is suppressed under suppress_list_output).
 #' @param folder_name
 #' Optional character string to assign a custom name to the output folder. When folder_name is not specified, the folder name is set to “MetaPipe Output”.
 #' @param suppress_list_output
@@ -32,14 +32,23 @@
 #'
 #' @details
 #'
-#' Pipeline Struktur und Verweise auf die anderen Befehl-Dokus
+#' The MetaPipe pipeline is a tool to provide structure to the meta-analytical-analyses of multi-lab replication projects. A flowchart that depicts the whole process is available at https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary%20Material/MetaPipe%20Flow%20Chart.pdf
+#' The dark blue blocks are .csv files. The dark green blocks each refer to a step in the pipeline that is performed by a MetaPipe function. MetaPipe::full_pipeline() performs all of these steps and returns "MetaPipe_Data.csv" which may be provided to the MetaPipe App for handy data selection and basic plotting of the analysis results.
+#' For an example of the MetaPipe Output structure, please refer to https://github.com/JensFuenderich/MetaPipe/tree/main/Supplementary%20Material/Table%20Templates
+#'
 #'
 #' @return
 #'
-#' Etwas über den Output
+#' The output is a nested list object that represents the folder structure that is available under https://github.com/JensFuenderich/MetaPipe/tree/main/Supplementary%20Material/Table%20Templates
+#'
+#'
+#' #### Example
+#'
+#' For an example, please refer to the github repository:
+#' https://github.com/JensFuenderich/MetaPipe/blob/main/Supplementary%20Material/Code%20Examples/full_pipeline().R
 #'
 #' @export
-#'
+
 full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, DV = NULL, Group = NULL, output_path, folder_name = NULL, suppress_list_output = FALSE, method = "REML"){
 
   ### Run full pipeline
