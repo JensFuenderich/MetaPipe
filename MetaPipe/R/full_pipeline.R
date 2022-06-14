@@ -181,7 +181,7 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
                                                                   Lab = {{Lab}},
                                                                   DV = {{DV}},
                                                                   Group = {{Group}},
-                                                                  output_path = glue::glue("{MetaPipe_folder}/Lab Summaries/"),
+                                                                  output_folder = glue::glue("{MetaPipe_folder}/Lab Summaries/"),
                                                                   suppress_list_output = FALSE)
   }
 
@@ -191,20 +191,20 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
                                                                         suppress_list_output = FALSE)
   } else {
     output_list$Merged_Lab_Summaries <- MetaPipe::merge_lab_summaries(data = output_list$Lab_Summaries$lab_summaries,
-                                                                      output_path = glue::glue("{MetaPipe_folder}/Merged Lab Summaries/"),
+                                                                      output_folder = glue::glue("{MetaPipe_folder}/Merged Lab Summaries/"),
                                                                       suppress_list_output = FALSE)
   }
 
   ## 4. Step of Pipeline: perform meta analyses
   if (missing(output_path)) {
     output_list$Meta_Analyses <- MetaPipe::meta_analyses(data = output_list$Merged_Lab_Summaries$merged_lab_summaries,
-                                                           suppress_list_output = FALSE,
-                                                           method = method)
+                                                         suppress_list_output = FALSE,
+                                                         method = method)
   } else {
     output_list$Meta_Analyses <- MetaPipe::meta_analyses(data = output_list$Merged_Lab_Summaries$merged_lab_summaries,
-                                                           output_path = glue::glue("{MetaPipe_folder}/Meta Analyses/"),
-                                                           suppress_list_output = FALSE,
-                                                           method = method)
+                                                         output_folder = glue::glue("{MetaPipe_folder}/Meta Analyses/"),
+                                                         suppress_list_output = FALSE,
+                                                         method = method)
   }
 
   ## 5. Step of Pipeline: create a data frame for the MetaPipe App
