@@ -1,6 +1,0 @@
-"","Column_Name","Description"
-"1","Project","The project in which the replication was publicised (e.g., ML2)"
-"2","Replication","The name of the replication (or replicated effect)"
-"3","Lab","The lab that a data point is associated with"
-"4","DV","The single (aggregated) outcome value of the dependend variable"
-"5","Group","Indicates the data point being part of either the treatment (1) or control group (0)"
