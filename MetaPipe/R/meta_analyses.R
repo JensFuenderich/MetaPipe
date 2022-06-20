@@ -134,7 +134,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       # H2 Analyses:
       "H2__T_M",
       "H2__C_M",
-      "H2__TSD",
+      "H2__T_SD",
       "H2__C_SD",
       "H2__MD",
       "H2__pooled_SD",
