@@ -57,7 +57,7 @@
 "MA__I2__SMD","meta analysis level: I2 for standardized mean difference"
 "MA__H2__T_M","meta analysis level: H2 for treatment group mean"
 "MA__H2__C_M","meta analysis level: H2 for control group mean"
-"MA__H2__T_SD","meta analysis level: H2 for treatment group standard deviation"
+"MA__H2__TSD","meta analysis level: H2 for TSD"
 "MA__H2__C_SD","meta analysis level: H2 for control group standard deviation"
 "MA__H2__MD","meta analysis level: H2 for mean difference"
 "MA__H2__pooled_SD","meta analysis level: H2 for pooled standard deviation"
@@ -76,3 +76,4 @@
 "MA__QEp__MD","meta analysis level: QEp for mean difference"
 "MA__QEp__pooled_SD","meta analysis level: QEp for pooled standard deviation"
 "MA__QEp__SMD","meta analysis level: QEp for standardized mean difference"
+"MA__H2__T_SD","meta analysis level: H2 for treatment group standard deviation"
