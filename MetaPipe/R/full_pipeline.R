@@ -247,8 +247,6 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
 
   ### Create codebook
 
-
-
   # create empty df
   abbr_library <- data.frame(Abbreviation = logical(0),
                              Full_Name = logical(0))
@@ -267,6 +265,9 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
                                             c("MA__", "meta analysis level:__"),
                                             c("__pooled_", "__pooled_"),
                                             c("Lab__", "lab level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
+                                            c("__Tau2_", "__Tau2 for_"),
+                                            c("__Tau_", "__Tau for_"),
+                                            c("__CoeffVar_", "__Coefficient of Variation (tau/mu) for_"),
                                             c("__I2_", "__I2 for_"),
                                             c("__H2_", "__H2 for_"),
                                             c("__QE_", "__QE for_"),
@@ -301,7 +302,10 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
     gsub(abbr_library$Abbreviation[14], abbr_library$`Full Name`[14], .) %>%
     gsub(abbr_library$Abbreviation[15], abbr_library$`Full Name`[15], .) %>%
     gsub(abbr_library$Abbreviation[16], abbr_library$`Full Name`[16], .) %>%
-    gsub(abbr_library$Abbreviation[17], abbr_library$`Full Name`[17], .)
+    gsub(abbr_library$Abbreviation[17], abbr_library$`Full Name`[17], .) %>%
+    gsub(abbr_library$Abbreviation[18], abbr_library$`Full Name`[18], .) %>%
+    gsub(abbr_library$Abbreviation[19], abbr_library$`Full Name`[19], .) %>%
+    gsub(abbr_library$Abbreviation[20], abbr_library$`Full Name`[20], .)
 
   description_vector <- stringr::str_replace_all(description_vector, "__Empirical__", "_")
 

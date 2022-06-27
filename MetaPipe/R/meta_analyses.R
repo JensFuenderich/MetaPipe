@@ -123,6 +123,14 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       "Tau__pooled_SD",
       "Tau__MD",
       "Tau__SMD",
+      # Coefficient of Variation Analyses:
+      "CoeffVar__T_M",
+      "CoeffVar__C_M",
+      "CoeffVar__T_SD",
+      "CoeffVar__C_SD",
+      "CoeffVar__pooled_SD",
+      "CoeffVar__MD",
+      "CoeffVar__SMD",
       # I2 Analyses:
       "I2__T_M",
       "I2__C_M",
@@ -215,6 +223,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__T_M_K"] <- Het_T_M$k
       Replication.df["Tau2__T_M"] <- Het_T_M$sigma2
       Replication.df["Tau__T_M"] <- sqrt(Het_T_M$sigma2)
+      Replication.df["CoeffVar__T_M"] <- sqrt(Het_T_M$sigma2)/Het_T_M$b
       Replication.df["I2__T_M"] <- I2_fct(rma_mv_obj = Het_T_M, v_est = v_estimate)
       Replication.df["H2__T_M"] <- H2_fct(rma_mv_obj = Het_T_M, v_est = v_estimate)
       Replication.df["QE__T_M"] <- Het_T_M$QE
@@ -241,6 +250,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__C_M_K"] <- Het_C_M$k
       Replication.df["Tau2__C_M"] <- Het_C_M$sigma2
       Replication.df["Tau__C_M"] <- sqrt(Het_C_M$sigma2)
+      Replication.df["CoeffVar__C_M"] <- sqrt(Het_C_M$sigma2)/Het_C_M$b
       Replication.df["I2__C_M"] <- I2_fct(rma_mv_obj = Het_C_M, v_est = v_estimate)
       Replication.df["H2__C_M"] <- H2_fct(rma_mv_obj = Het_C_M, v_est = v_estimate)
       Replication.df["QE__C_M"] <- Het_C_M$QE
@@ -266,6 +276,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__T_SD_K"] <- Het_T_SD$k
       Replication.df["Tau2__T_SD"] <- Het_T_SD$sigma2
       Replication.df["Tau__T_SD"] <- sqrt(Het_T_SD$sigma2)
+      Replication.df["CoeffVar__T_SD"] <- sqrt(Het_T_SD$sigma2)/Het_T_SD$b
       Replication.df["I2__T_SD"] <- I2_fct(rma_mv_obj = Het_T_SD, v_est = v_estimate)
       Replication.df["H2__T_SD"] <- H2_fct(rma_mv_obj = Het_T_SD, v_est = v_estimate)
       Replication.df["QE__T_SD"] <- Het_T_SD$QE
@@ -291,6 +302,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__C_SD_K"] <- Het_C_SD$k
       Replication.df["Tau2__C_SD"] <- Het_C_SD$sigma2
       Replication.df["Tau__C_SD"] <- sqrt(Het_C_SD$sigma2)
+      Replication.df["CoeffVar__C_SD"] <- sqrt(Het_C_SD$sigma2)/Het_C_SD$b
       Replication.df["I2__C_SD"] <- I2_fct(rma_mv_obj = Het_C_SD, v_est = v_estimate)
       Replication.df["H2__C_SD"] <- H2_fct(rma_mv_obj = Het_C_SD, v_est = v_estimate)
       Replication.df["QE__C_SD"] <- Het_C_SD$QE
@@ -315,6 +327,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__MD_K"] <- Het_MD$k
       Replication.df["Tau2__MD"] <- Het_MD$sigma2
       Replication.df["Tau__MD"] <- sqrt(Het_MD$sigma2)
+      Replication.df["CoeffVar__MD"] <- sqrt(Het_MD$sigma2)/Het_MD$b
       Replication.df["I2__MD"] <- I2_fct(rma_mv_obj = Het_MD, v_est = v_estimate)
       Replication.df["H2__MD"] <- H2_fct(rma_mv_obj = Het_MD, v_est = v_estimate)
       Replication.df["QE__MD"] <- Het_MD$QE
@@ -340,6 +353,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__pooled_SD_K"] <- Het_pooled_SD$k
       Replication.df["Tau2__pooled_SD"] <- Het_pooled_SD$sigma2
       Replication.df["Tau__pooled_SD"] <- sqrt(Het_pooled_SD$sigma2)
+      Replication.df["CoeffVar__pooled_SD"] <- sqrt(Het_pooled_SD$sigma2)/Het_pooled_SD$b
       Replication.df["I2__pooled_SD"] <- I2_fct(rma_mv_obj = Het_pooled_SD, v_est = v_estimate)
       Replication.df["H2__pooled_SD"] <- H2_fct(rma_mv_obj = Het_pooled_SD, v_est = v_estimate)
       Replication.df["QE__pooled_SD"] <- Het_pooled_SD$QE
@@ -366,6 +380,7 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       Replication.df["Model_Estimate__SMD_K"] <- Het_SMD$k
       Replication.df["Tau2__SMD"] <- Het_SMD$sigma2
       Replication.df["Tau__SMD"] <- sqrt(Het_SMD$sigma2)
+      Replication.df["CoeffVar__SMD"] <- sqrt(Het_SMD$sigma2)/Het_SMD$b
       Replication.df["I2__SMD"] <- I2_fct(rma_mv_obj = Het_SMD, v_est = v_estimate)
       Replication.df["H2__SMD"] <- H2_fct(rma_mv_obj = Het_SMD, v_est = v_estimate)
       Replication.df["QE__SMD"] <- Het_SMD$QE
@@ -418,6 +433,9 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
                                             c("MA__", "meta analysis level:__"),
                                             c("__pooled_", "__pooled_"),
                                             c("Lab__", "lab level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
+                                            c("__Tau2_", "__Tau2 for_"),
+                                            c("__Tau_", "__Tau for_"),
+                                            c("__CoeffVar_", "__Coefficient of Variation (tau/mu) for_"),
                                             c("__I2_", "__I2 for_"),
                                             c("__H2_", "__H2 for_"),
                                             c("__QE_", "__QE for_"),
@@ -452,7 +470,10 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
     gsub(abbr_library$Abbreviation[14], abbr_library$`Full Name`[14], .) %>%
     gsub(abbr_library$Abbreviation[15], abbr_library$`Full Name`[15], .) %>%
     gsub(abbr_library$Abbreviation[16], abbr_library$`Full Name`[16], .) %>%
-    gsub(abbr_library$Abbreviation[17], abbr_library$`Full Name`[17], .)
+    gsub(abbr_library$Abbreviation[17], abbr_library$`Full Name`[17], .) %>%
+    gsub(abbr_library$Abbreviation[18], abbr_library$`Full Name`[18], .) %>%
+    gsub(abbr_library$Abbreviation[19], abbr_library$`Full Name`[19], .) %>%
+    gsub(abbr_library$Abbreviation[20], abbr_library$`Full Name`[20], .)
 
   description_vector <- stringr::str_replace_all(description_vector, "__Empirical__", "_")
 
