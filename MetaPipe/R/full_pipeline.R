@@ -1,9 +1,9 @@
 #' Full Pipeline Function
 #'
 #'
-#' @import glue
 #' @import dplyr
-#' @import stringr
+#' @import utils
+#' @import mathjaxr
 #'
 #' @description
 #' \loadmathjax{}
@@ -67,30 +67,29 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
 
   ## Folder Structure
   if (missing(output_path)) {
-    print("You chose not to export the output of the pipeline.")
+    base::print("You chose not to export the output of the pipeline.")
   } else {
 
     ## create the output folder
     if (is.null(folder_name)) { # create folder with the default name "MetaPipe Output"
       # glue names
-      MetaPipe_folder <- glue::glue("{output_path}MetaPipe Output")
+      MetaPipe_folder <- paste(output_path, "MetaPipe Output", sep = "")
     } else { # create folder with custom name
       # glue names
-      MetaPipe_folder <- glue::glue("{output_path}{folder_name}")
+      MetaPipe_folder <- paste(output_path, folder_name, sep = "")
     }
     # create directory
     dir.create(MetaPipe_folder)
     # create folder for individual participant data
-    dir.create(glue::glue("{MetaPipe_folder}/Individual Participant Data"))
+    dir.create(paste(MetaPipe_folder, "/Individual Participant Data", sep = ""))
     # create folder for lab summaries
-    dir.create(glue::glue("{MetaPipe_folder}/Lab Summaries"))
+    dir.create(paste(MetaPipe_folder, "/Lab Summaries", sep = ""))
     # create folder for merged lab summaries
-    dir.create(glue::glue("{MetaPipe_folder}/Merged Lab Summaries"))
+    dir.create(paste(MetaPipe_folder, "/Merged Lab Summaries", sep = ""))
     # create folder for meta analyses
-    dir.create(glue::glue("{MetaPipe_folder}/Meta Analyses"))
+    dir.create(paste(MetaPipe_folder, "/Meta Analyses", sep = ""))
     # create folder for meta analyses
-    dir.create(glue::glue("{MetaPipe_folder}/Meta Pipe"))
-
+    dir.create(paste(MetaPipe_folder, "/Meta Pipe", sep = ""))
   }
 
   ## create output list
@@ -137,7 +136,7 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
     project_name <- unique(x$Project)
     replication_name <- unique(x$Replication)
     write.csv(x,
-              file = glue::glue("{MetaPipe_folder}/Individual Participant Data/{project_name}_{replication_name}_individual_participant_data.csv"),
+              file = paste(MetaPipe_folder, "/Individual Participant Data/", project_name, "_", replication_name, "_individual_participant_data.csv",  sep = ""),
               row.names = FALSE)
   }
   # apply function
@@ -157,7 +156,7 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
 
   # export codebook for individual participant data
   if (missing(output_path)) {} else { write.csv(codebook_ipd,
-                                                  glue::glue("{MetaPipe_folder}/Individual Participant Data/codebook_for_individual_participant_data.csv"))}
+                                                paste(MetaPipe_folder, "/Individual Participant Data/codebook_for_individual_participant_data.csv", sep = ""))}
 
 
   # add to the output list for step 1 of the pipeline
@@ -168,21 +167,21 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
   ## 2. Step of Pipeline: create lab summaries
   if (missing(output_path)) {
     output_list$Lab_Summaries <- MetaPipe::create_lab_summaries(data = data,
-                                                                  Project = {{Project}},
-                                                                  Replication = {{Replication}},
-                                                                  Lab = {{Lab}},
-                                                                  DV = {{DV}},
-                                                                  Group = {{Group}},
-                                                                  suppress_list_output = FALSE)
+                                                                Project = {{Project}},
+                                                                Replication = {{Replication}},
+                                                                Lab = {{Lab}},
+                                                                DV = {{DV}},
+                                                                Group = {{Group}},
+                                                                suppress_list_output = FALSE)
   } else {
     output_list$Lab_Summaries <- MetaPipe::create_lab_summaries(data = data,
-                                                                  Project = {{Project}},
-                                                                  Replication = {{Replication}},
-                                                                  Lab = {{Lab}},
-                                                                  DV = {{DV}},
-                                                                  Group = {{Group}},
-                                                                  output_folder = glue::glue("{MetaPipe_folder}/Lab Summaries/"),
-                                                                  suppress_list_output = FALSE)
+                                                                Project = {{Project}},
+                                                                Replication = {{Replication}},
+                                                                Lab = {{Lab}},
+                                                                DV = {{DV}},
+                                                                Group = {{Group}},
+                                                                output_folder = paste(MetaPipe_folder, "/Lab Summaries/", sep = ""),
+                                                                suppress_list_output = FALSE)
   }
 
   ## 3. Step of Pipeline: merge lab summaries
@@ -191,7 +190,7 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
                                                                         suppress_list_output = FALSE)
   } else {
     output_list$Merged_Lab_Summaries <- MetaPipe::merge_lab_summaries(data = output_list$Lab_Summaries$lab_summaries,
-                                                                      output_folder = glue::glue("{MetaPipe_folder}/Merged Lab Summaries/"),
+                                                                      output_folder = paste(MetaPipe_folder, "/Merged Lab Summaries/", sep = ""),
                                                                       suppress_list_output = FALSE)
   }
 
@@ -202,7 +201,7 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
                                                          method = method)
   } else {
     output_list$Meta_Analyses <- MetaPipe::meta_analyses(data = output_list$Merged_Lab_Summaries$merged_lab_summaries,
-                                                         output_folder = glue::glue("{MetaPipe_folder}/Meta Analyses/"),
+                                                         output_folder = paste(MetaPipe_folder, "/Meta Analyses/", sep = ""),
                                                          suppress_list_output = FALSE,
                                                          method = method)
   }
@@ -230,14 +229,14 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
   # add "Lab__Empirical__" to all lab related columns and "MA__" to all meta-analysis columns
   # Lab
   # columns from "T_N" to "SE_SMD"
-  first_lab_col <- which(names(MetaPipe_Data) == "T_N")
-  last_lab_col <- which(names(MetaPipe_Data) == "SE_SMD")
-  names(MetaPipe_Data)[first_lab_col:last_lab_col] <- stringr::str_c("Lab__Empirical__", names(MetaPipe_Data[,first_lab_col:last_lab_col]))
+  first_lab_col <- base::which(names(MetaPipe_Data) == "T_N")
+  last_lab_col <- base::which(names(MetaPipe_Data) == "SE_SMD")
+  names(MetaPipe_Data)[first_lab_col:last_lab_col] <- paste("Lab__Empirical__", names(MetaPipe_Data[,first_lab_col:last_lab_col]), sep = "")
 
   # MA
   first_lab_MA <- last_lab_col + 1
   last_lab_MA <- ncol(MetaPipe_Data)
-  names(MetaPipe_Data)[first_lab_MA:last_lab_MA] <- stringr::str_c("MA__", names(MetaPipe_Data[,first_lab_MA:last_lab_MA]))
+  names(MetaPipe_Data)[first_lab_MA:last_lab_MA] <- paste("MA__", names(MetaPipe_Data[,first_lab_MA:last_lab_MA]), sep = "")
 
   # delete duplicate/redundant columns
   MetaPipe_Data$MA__Project <- NULL
@@ -307,11 +306,10 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
     gsub(abbr_library$Abbreviation[19], abbr_library$`Full Name`[19], .) %>%
     gsub(abbr_library$Abbreviation[20], abbr_library$`Full Name`[20], .)
 
-  description_vector <- stringr::str_replace_all(description_vector, "__Empirical__", "_")
-
-  description_vector <- stringr::str_replace_all(description_vector, "___", "_")
-  description_vector <- stringr::str_replace_all(description_vector, "__", "_")
-  description_vector <- stringr::str_replace_all(description_vector, "_", " ")
+  description_vector <- sub(pattern = "__Empirical__", replacement = "_", description_vector)
+  description_vector <- sub(pattern = "___", replacement = "_", description_vector)
+  description_vector <- sub(pattern = "__", replacement = "_", description_vector)
+  description_vector <- sub(pattern = "_", replacement = " ", description_vector)
 
   codebook_for_meta_pipe <- data.frame(Variable_Name = names(MetaPipe_Data), Variable_Description = description_vector)
 
@@ -332,15 +330,15 @@ full_pipeline <- function(data, Project = NULL, Replication = NULL, Lab = NULL, 
   # export data
   if (missing(output_path)) {} else {
     write.csv(MetaPipe_Data,
-              glue::glue("{MetaPipe_folder}/Meta Pipe/MetaPipe_Data.csv"),
+              paste(MetaPipe_folder, "/Meta Pipe/MetaPipe_Data.csv", sep = ""),
               row.names = FALSE)
     write.csv(codebook_for_meta_pipe,
-              glue::glue("{MetaPipe_folder}/Meta Pipe/codebook_for_meta_pipe_data.csv"),
+              paste(MetaPipe_folder, "/Meta Pipe/codebook_for_meta_pipe_data.csv", sep = ""),
               row.names = FALSE)
   }
 
   if (suppress_list_output == TRUE) {
-    print("You chose not to return results in R. If you specified an output folder, check that folder for the output of the pipeline.")
+    base::print("You chose not to return results in R. If you specified an output folder, check that folder for the output of the pipeline.")
   } else {
     return(output_list)
   }

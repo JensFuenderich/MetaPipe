@@ -2,7 +2,6 @@
 #'
 #' @import readr
 #' @import dplyr
-#' @import glue
 #' @import utils
 #'
 #'
@@ -117,7 +116,7 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
       gsub(abbr_library$Abbreviation[11], abbr_library$`Full Name`[11], .) %>%
       gsub(abbr_library$Abbreviation[12], abbr_library$`Full Name`[12], .)
 
-    description_vector <- stringr::str_replace_all(description_vector, "_", " ")
+    description_vector <- sub(pattern = "_", replacement = " ", description_vector)
 
     codebook_for_merged_lab_summeries <- data.frame(Variable_Name = names(merged_lab_summaries), Variable_Description = description_vector)
 
@@ -130,23 +129,23 @@ merge_lab_summaries <- function(data, output_folder, suppress_list_output = FALS
 
   if (missing(output_folder)) {
 
-    print("You chose not to export the data as .csv files.")
+    base::print("You chose not to export the data as .csv files.")
 
   } else {
 
     # export .csv files
     write.csv(merged_lab_summaries,
-              glue::glue("{output_folder}merged_lab_summeries.csv"),
+              paste(output_folder, "merged_lab_summaries.csv", sep = ""),
               row.names = FALSE)
     write.csv(codebook_for_merged_lab_summeries,
-              glue::glue("{output_folder}codebook_for_merged_lab_summeries.csv"),
+              paste(output_folder, "codebook_for_merged_lab_summeries.csv", sep = ""),
               row.names = FALSE)
 
   }
 
   if (suppress_list_output == TRUE) {
 
-    print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
+    base::print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
 
   } else if (suppress_list_output == FALSE) {
 

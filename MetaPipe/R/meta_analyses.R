@@ -2,7 +2,6 @@
 #'
 #'
 #' @import metafor
-#' @import purrr
 #' @import dplyr
 #' @import mathjaxr
 #' @import stats
@@ -389,10 +388,10 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
       rm(Het_SMD)
     }
 
-    Project <- unique(subset_Replication$Project)
-    Replication <- unique(subset_Replication$Replication)
-    Replication.df <- tibble::add_column(Replication.df, Project, .before = "Empirical__K")
-    Replication.df <- tibble::add_column(Replication.df, Replication, .before = "Empirical__K")
+    # add descriptive columns
+    descriptive_columns <- data.frame(Project = unique(subset_Replication$Project),
+                                      Replication = unique(subset_Replication$Replication))
+    Replication.df <- cbind(descriptive_columns, Replication.df)
 
     return(Replication.df)
 
@@ -407,7 +406,8 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
   nested_data_list_Replication_split <- lapply(1:length(data_list_Project_split), function(x){split(data_list_Project_split[[x]], data_list_Project_split[[x]]$Replication)})
   names(nested_data_list_Replication_split) <- names(data_list_Project_split)
 
-  nested_list_output <- lapply(1:length(nested_data_list_Replication_split),function(x){purrr::map(nested_data_list_Replication_split[[x]], single_replication_analyses)})
+  # nested_list_output <- lapply(1:length(nested_data_list_Replication_split),function(x){purrr::map(nested_data_list_Replication_split[[x]], single_replication_analyses)})
+  nested_list_output <- lapply(1:length(nested_data_list_Replication_split),function(x){lapply(nested_data_list_Replication_split[[x]], single_replication_analyses)})
 
   names(nested_list_output) <- names(data_list_Project_split)
 
@@ -430,16 +430,16 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
                                             c("_SD", "_standard deviation"),
                                             c("__SE_", "__standard error of the_"),
                                             c("_SMD", "_standardized mean difference"),
-                                            c("MA__", "meta analysis level:__"),
+                                            # c("MA__", "meta analysis level:__"),
                                             c("__pooled_", "__pooled_"),
-                                            c("Lab__", "lab level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
-                                            c("__Tau2_", "__Tau2 for_"),
-                                            c("__Tau_", "__Tau for_"),
-                                            c("__CoeffVar_", "__Coefficient of Variation (tau/mu) for_"),
-                                            c("__I2_", "__I2 for_"),
-                                            c("__H2_", "__H2 for_"),
-                                            c("__QE_", "__QE for_"),
-                                            c("__QEp_", "__QEp for_")
+                                            # c("Lab__", "lab level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
+                                            c("Tau2__", "Tau2 for__"),
+                                            c("Tau__", "Tau for__"),
+                                            c("CoeffVar__", "Coefficient of Variation (tau/mu) for__"),
+                                            c("I2__", "I2 for__"),
+                                            c("H2__", "H2 for__"),
+                                            c("QE__", "QE for__"),
+                                            c("QEp__", "QEp for__")
   ))
 
   # rename columns of df
@@ -471,15 +471,12 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
     gsub(abbr_library$Abbreviation[15], abbr_library$`Full Name`[15], .) %>%
     gsub(abbr_library$Abbreviation[16], abbr_library$`Full Name`[16], .) %>%
     gsub(abbr_library$Abbreviation[17], abbr_library$`Full Name`[17], .) %>%
-    gsub(abbr_library$Abbreviation[18], abbr_library$`Full Name`[18], .) %>%
-    gsub(abbr_library$Abbreviation[19], abbr_library$`Full Name`[19], .) %>%
-    gsub(abbr_library$Abbreviation[20], abbr_library$`Full Name`[20], .)
+    gsub(abbr_library$Abbreviation[18], abbr_library$`Full Name`[18], .)
 
-  description_vector <- stringr::str_replace_all(description_vector, "__Empirical__", "_")
-
-  description_vector <- stringr::str_replace_all(description_vector, "___", "_")
-  description_vector <- stringr::str_replace_all(description_vector, "__", "_")
-  description_vector <- stringr::str_replace_all(description_vector, "_", " ")
+  description_vector <- sub(pattern = "__Empirical__", replacement = "_", description_vector)
+  description_vector <- sub(pattern = "___", replacement = "_", description_vector)
+  description_vector <- sub(pattern = "__", replacement = "_", description_vector)
+  description_vector <- sub(pattern = "_", replacement = " ", description_vector)
 
   codebook_for_meta_analyses <- data.frame(Variable_Name = names(meta_analyses), Variable_Description = description_vector)
 
@@ -487,23 +484,23 @@ meta_analyses <- function(data, output_folder, suppress_list_output = FALSE, met
 
   if (missing(output_folder)) {
 
-    print("You chose not to export the data as .csv files.")
+    base::print("You chose not to export the data as .csv files.")
 
   } else {
 
     # export .csv files
     write.csv(meta_analyses,
-              glue::glue("{output_folder}meta analyses.csv"),
+              paste(output_folder, "meta_analyses.csv", sep = ""),
               row.names = FALSE)
     write.csv(codebook_for_meta_analyses,
-              glue::glue("{output_folder}codebook for meta analyses.csv"),
+              paste(output_folder, "codebook_for_meta_analyses.csv", sep = ""),
               row.names = FALSE)
 
   }
 
   if (suppress_list_output == TRUE) {
 
-    print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
+    base::print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
 
   } else if (suppress_list_output == FALSE) {
 

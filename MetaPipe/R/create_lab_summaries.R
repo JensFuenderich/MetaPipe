@@ -2,9 +2,7 @@
 #'
 #'
 #' @import dplyr
-#' @import purrr
 #' @import metafor
-#' @import glue
 #' @import utils
 #' @import tibble
 #' @import mathjaxr
@@ -499,12 +497,10 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
     lab.df["C_N"] <- length(control_group$DV)
 
     # add descriptive columns
-    Project <- unique(data$Project)
-    Replication <- unique(data$Replication)
-    Lab <- unique(data$Lab)
-    lab.df <- tibble::add_column(lab.df, Project, .before = "T_N")
-    lab.df <- tibble::add_column(lab.df, Replication, .before = "T_N")
-    lab.df <- tibble::add_column(lab.df, Lab, .before = "T_N")
+    descriptive_columns <- data.frame(Project = unique(data$Project),
+                                      Replication = unique(data$Replication),
+                                      Lab = unique(data$Lab))
+    lab.df <- cbind(descriptive_columns, lab.df)
 
     return(lab.df)
 
@@ -517,20 +513,24 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
       split(., .$Lab)
   }
   # apply the function
-  data_List_Nested_Labs <- purrr::map(data_List, split_Labs)
+  # data_List_Nested_Labs <- purrr::map(data_List, split_Labs)
+  data_List_Nested_Labs <- lapply(data_List, split_Labs)
 
   ## perform the lab summaries
   # create a function that applies the single_lab_summary function to all replications
   create_summaries <- function(x){
     Single_Replication <- data_List_Nested_Labs[[x]]
-    dplyr::bind_rows(purrr::map(Single_Replication, single_lab_summary))
+    # dplyr::bind_rows(purrr::map(Single_Replication, single_lab_summary))
+    dplyr::bind_rows(lapply(Single_Replication, single_lab_summary))
   }
   # apply the function
   List_of_Lab_Summaries_per_Replication <- lapply(1:length(data_List_Nested_Labs), create_summaries)
 
   ## rename the output with Project and Replication name
   # create vector with names
-  names_for_list <- unlist(lapply(1:length(List_of_Lab_Summaries_per_Replication), function(x){glue::glue("{unique(List_of_Lab_Summaries_per_Replication[[x]]$Project)}_{unique(List_of_Lab_Summaries_per_Replication[[x]]$Replication)}")}))
+  names_for_list <- unlist(lapply(1:length(List_of_Lab_Summaries_per_Replication), function(x){
+    paste(unique(List_of_Lab_Summaries_per_Replication[[x]]$Project), "_", unique(List_of_Lab_Summaries_per_Replication[[x]]$Replication), sep = "")
+    }))
   # rename output
   names(List_of_Lab_Summaries_per_Replication) <- names_for_list
 
@@ -573,7 +573,7 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
     gsub(abbr_library$Abbreviation[11], abbr_library$`Full Name`[11], .) %>%
     gsub(abbr_library$Abbreviation[12], abbr_library$`Full Name`[12], .)
 
-  description_vector <- stringr::str_replace_all(description_vector, "_", " ")
+  description_vector <- sub(pattern = "_", replacement = " ", description_vector)
 
   codebook <- data.frame(Variable_Name = names(List_of_Lab_Summaries_per_Replication[[1]]), Variable_Description = description_vector)
   codebook <- codebook[-c(1:2),]
@@ -586,7 +586,7 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
 
   if (missing(output_folder)) {
 
-    print("You chose not to export the data as .csv files.")
+    base::print("You chose not to export the data as .csv files.")
 
   } else {
 
@@ -597,7 +597,7 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
       project_name <- unique(replication_data$Project)
       replication_name <- unique(replication_data$Replication)
       write.csv(replication_data,
-                glue::glue("{output_folder}{project_name}_{replication_name}_lab_summaries.csv"),
+                paste(output_folder, project_name, "_", replication_name, "_lab_summaries.csv", sep = ""),
                 row.names = FALSE)
     }
     # sorry for the loop, this way I didn't have to struggle with suppressing some output
@@ -606,14 +606,14 @@ create_lab_summaries <- function(data, Project = NULL, Replication = NULL, Lab =
     }
     # export codebook
     write.csv(codebook,
-              glue::glue("{output_folder}codebook_for_merged_lab_summaries.csv"),
+              paste(output_folder, "codebook_for_merged_lab_summaries.csv", sep = ""),
               row.names = FALSE)
 
   }
 
   if (suppress_list_output == TRUE) {
 
-    print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
+    base::print("You chose not to return results in R. If you specified an output folder, check that folder for the code book and merged lab summaries.")
 
   } else if (suppress_list_output == FALSE) {
 
